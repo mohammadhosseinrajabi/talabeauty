@@ -1,0 +1,429 @@
+/* این فایل فقط برای صفحه‌ی اصلی است */
+/* body {
+  background-color: rgb(219, 0, 0); 
+} */
+
+.bodyPage {
+  background-color: #F9FAFB;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.navbar {
+  /* background-color: aqua; */
+  color: black;
+  width: 100%;
+}
+.userPic{
+  width: 25px;
+}
+.btn-login{
+  border: 1px solid #D0D5DD;
+  border-radius: 9px;
+  color: rgb(71, 84, 103);
+  padding: 6px 27px;
+  transition-duration: 0.3s;
+  background-color: transparent;
+}
+.btn-login:hover{
+  background-color: #D0D5DD;
+}
+.nav-link{
+  color: #D3CEB9 !important;
+}
+.nav-link:hover{
+color: #CF9E86!important;
+}
+.nav-desktop{
+  height: 69px;
+}
+@media screen and (max-width: 991px) {
+  .nav-desktop {
+   display: none !important;
+  }
+}
+
+
+
+/*end nav*/
+
+
+/*start nav mobile*/
+.navMobile{
+  position: fixed;
+  height: 100vh;
+  width: 100%;
+  background-color: #cbc9c953;
+  z-index: 999;
+  margin-right: -100%;
+}
+.navList{
+  position: fixed;
+  height: 100vh;
+  width: 40%;
+  background-color: #ffffff;
+  z-index: 999;
+  margin-right: -100%;
+  transition-duration: 0.7s;
+}
+.showMenuMobile{
+  margin-right: 0;
+  
+}
+.logo{
+  text-decoration: none;
+  font-size: 13px;
+  color: #f4b868;
+  font-weight: bold;
+  top: 3px;
+  position: relative;
+}
+.logo-menu{
+  width: 46px;
+    display: flex;
+    margin: auto;
+}
+
+@media screen and (min-width: 991px) {
+  #topMenuMobile{
+   display: none !important;
+  }
+}
+
+/*start searchBar section*/
+.searchBar {
+  background-size: cover;
+  height: 600px;
+  width: 100%;
+  position: relative;
+}
+@media screen and  (max-width: 991px){
+  .searchBar{
+    background: url('../../public/auth/images/backHomePage.webp');
+    background-size: cover;
+    height: 400px;
+  }
+}
+@media screen and (max-width: 991px){
+.oneText,.twoText{
+    font-size: 15px !important;
+  line-height: 15px;
+  }
+  .search-container{
+    top: 0 !important;
+    /* width: 50%; */
+    /* margin: auto; */
+     
+  }
+  .stats-section{
+    top: -1px !important;
+  }
+  .stat-label ,.stat-number{
+   
+    font-size: 15px !important;
+  }
+  .search-input::placeholder{
+    font-size: 13px !important;
+  }
+}
+.oneText{
+  
+  font-size: 28px;
+  line-height: 98px;
+}
+.twoText{
+  font-size: 28px;
+  line-height: 40px;
+  color: white;
+}
+
+
+.search-container {
+  position: relative;
+  top: 30px;
+}
+
+.search-input {
+  height: 50px;
+  border-radius: 30px;
+  padding-left: 35px;
+  border: none;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+.search-input::placeholder{
+  color: #838282 !important; 
+}
+
+.search-icon {
+  position: absolute;
+  top: 50%;
+  left: 15px;
+  transform: translateY(-50%);
+  color: #888;
+}
+
+.stats-section{
+  position: relative;
+  top: 30%;
+  
+}
+.stat-label{
+  color: #fff;
+  
+}
+.stat-number{
+  color: #ffff;
+  padding: 15px;
+  font-size: 25px;
+  margin-bottom: 20px;
+}
+
+/**/
+
+
+
+
+/*barber boxs*/
+/* تنظیم استایل کارت‌ها */
+.boxStylist {
+  width: 100%;
+  max-width: 250px; /* کنترل سایز در حالت دسکتاپ */
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  padding: 15px;
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+  position: relative;
+}
+
+/* افکت هاور */
+.boxStylist:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* تنظیم تصویر داخل کارت */
+.picStylist {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
+/* تنظیم متن داخل کارت */
+.service-text {
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+
+@media (max-width: 992px) {
+  .col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+}
+
+@media (max-width: 768px) {
+  .col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+
+  .boxStylist {
+    max-width: 180px; 
+  }
+
+  .service-text {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 576px) {
+  .row {
+    flex-direction: row; /* چیدمان در دو ستون باقی بماند */
+    align-items: center;
+  }
+
+  .boxStylist {
+    max-width: 250px;
+    margin-bottom: 15px; /* فاصله بین کارت‌ها در موبایل */
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+/* slider cart*/
+
+@media (max-width: 576px){
+  .sliderContainer{
+    width: 100%;
+  }
+}
+.sliderContainer{
+  width: 83%;
+  top: 32px;
+  position: relative;
+}
+.sliderCart {
+  background-color: white;
+  width: 150px !important;
+  /* height: 100px;  */
+  border-radius: 10px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+}
+
+.sliderCart:hover {
+  transform: scale(1.05); /* بزرگ شدن کارت هنگام هاور */
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2); /* سایه بیشتر هنگام هاور */
+}
+
+.imageWrapper {
+  margin: auto;
+  /* height: 100px; */
+  /* width: 100px;  */
+  overflow: hidden;
+  border-radius: 8px; 
+}
+
+.sliderImage {
+  width: 100%;
+  /* height: 100%; */
+  object-fit: cover;
+}
+
+.sliderTitle {
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  margin-top: 10px;
+  color: #333; 
+}
+
+.sliderCount {
+  font-size: 12px;
+  color: #888; 
+  margin-top: 5px;
+  text-align: center;
+}
+
+
+
+/*citys*/
+.city{
+  width: 250px;
+  background-color: #fff;
+  padding: 12px;
+  border-radius: 9px;
+  margin: 8px 8px;
+}
+.city:hover{
+  background-color: #D3CEB9;
+  color: #fff !important;
+  transition-duration: 0.5s;
+}
+.city:hover a{
+  color: #fff !important;
+}
+@media (max-width: 992px) {
+  .city {
+    max-width: 45%;
+  }
+}
+
+
+
+
+
+/*about us*/
+.aboutUs{
+  width: 81%;
+  height: 400px;
+  background: url('../../public/auth/images/backAboutUs.webp') no-repeat center center ;
+  background-size: cover;
+  text-align: justify;
+}
+@media (max-width: 992px) {
+  .aboutUs {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+
+
+/*stylists slider*/
+
+
+
+
+
+
+
+
+/*top stylist*/
+.boxTopStylist{
+  background-color: white;
+  width: 200px !important;
+  /* height: 100px;  */
+  border-radius: 10px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+  /* display: flex; */
+  /* flex-direction: column; */
+  /* align-items: center; */
+  padding: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; 
+
+  /* margin: 5px 5px; */
+}
+.imgTopStylist{
+  width: 100%;
+  margin: auto;
+}
+@media (max-width: 992px) {
+  .boxTopStylist {
+      width: 150px !important;
+  }
+}
+
+
+
+
+
+
+/*Contents */
+.Contents-card{
+  /* width: 15rem !important; */
+  width: 250px !important;
+  text-align: center;
+  padding: 9px;
+  border: 1px solid black;
+  border-radius: 20px;
+}
+@media (max-width: 992px) {
+  .Contents-card {
+      width: 189px !important;
+       
+  }
+}
+
+
+  /*home page*/
+  
+  

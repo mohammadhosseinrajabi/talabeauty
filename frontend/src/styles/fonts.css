@@ -1,0 +1,56 @@
+/* Byekan Font */
+@font-face {
+  font-family: 'Byekan';
+  src: url('../../public/auth/fonts/byaken/Yekan.eot'),
+       url('../../public/auth/fonts/byaken/Yekan.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+/* Poppins Font */
+@font-face {
+  font-family: 'Poppins';
+  src: url('../../public/auth/fonts/poppins/Poppins-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('../../public/auth/fonts/poppins/Poppins-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Poppins';
+  src: url('../../public/auth/fonts/poppins/Poppins-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* Montserrat Font */
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../../public/auth/fonts/montserrat/Montserrat-Regular.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../../public/auth/fonts/montserrat/Montserrat-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('../../public/auth/fonts/montserrat/Montserrat-Bold.ttf') format('truetype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* Font Awesome */
+/* @import url('../../public/auth/fonts/font-awesome-4.7.0/css/font-awesome.css'); */
+/* auth/fonts/font-awesome-4.7.0/css/font-awesome.min.css */
