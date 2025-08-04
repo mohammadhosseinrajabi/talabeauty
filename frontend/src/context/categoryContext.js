@@ -1,17 +1,20 @@
-// import { Children, createContext, useState } from "react";
+import { createContext, useState } from "react";
 
-// export const CategoryContext = createContext({
-//     editID:null,
-//     setEditId: ()=>{}
-// })
 
-// const CategoryContextContainer =({})=>{
-//     const [editID,setEditId]=useState(null)
-//     return(
-//         <CategoryContext.Provider value={{editID,setEditId}}>
-//             {Children}
-//         </CategoryContext.Provider>
-//     )
-// }
-// export default CategoryContextContainer
+//for edit category
+export const CategoryContext = createContext({
+    editID:null,
+    setEditId: ()=>{}
+})
+
+const CategoryContextContainer =({children})=>{
+    const [editID,setEditId]=useState(null)
+    return(
+        <CategoryContext.Provider value={{editID,setEditId}}>
+            {children}
+        </CategoryContext.Provider>
+    )
+}
+export default CategoryContextContainer
+
 

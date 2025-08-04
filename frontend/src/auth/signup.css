@@ -1,8 +1,13 @@
+:root {
+  --primary-font: 'Byekan', 'Poppins', sans-serif;
+  --secondary-font: 'Montserrat', sans-serif;
+}
 body {
   margin: 0;
   padding: 0;
   border: 0;
   box-sizing: border-box;
+    font-family: var(--primary-font);
 }
 
 .signup-page {
@@ -87,6 +92,7 @@ body {
 }
 
 .signup-header {
+    font-family: var(--primary-font);
   text-align: center;
   margin-bottom: 2rem;
   margin-top: 0;
@@ -107,13 +113,15 @@ body {
 
 /* فرم */
 .signup-form {
+    font-family: var(--primary-font);
   width: 100%;
+  
 }
 
 .form-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
+  gap: 1.5rem; 
 }
 
 .form-group {
@@ -121,6 +129,7 @@ body {
   margin-bottom: 1.5rem;
   margin-left: 0;
   margin-right: 0;
+  
 }
 
 .form-group.full-width {
@@ -129,7 +138,7 @@ body {
 
 .form-input,
 .form-select {
-  width: 91%;
+  width: 100%;
   padding: 0.8rem 1rem;
   padding-right: 2.5rem;
   border: 1px solid #ddd;

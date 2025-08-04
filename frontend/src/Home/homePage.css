@@ -29,7 +29,7 @@
   background-color: #D0D5DD;
 }
 .nav-link{
-  color: #D3CEB9 !important;
+  color: #7c3aed !important;
 }
 .nav-link:hover{
 color: #CF9E86!important;
@@ -99,7 +99,7 @@ color: #CF9E86!important;
 }
 @media screen and  (max-width: 991px){
   .searchBar{
-    background: url('../../public/auth/images/backHomePage.webp');
+    background: url('../../public/auth/images/banner6.png');
     background-size: cover;
     height: 400px;
   }

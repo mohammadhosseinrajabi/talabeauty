@@ -1,18 +1,20 @@
-import React from 'react'
+import React, { useContext } from 'react'
 import LoginHomeBtn from './loginHomeBtn'
 import { Link } from 'react-router-dom'
+import AuthContext from '../context/AuthContext'
 
 export default function LeftNav() {
+
+
+
   return (
     <form className="d-flex">
-    {/* <ul className="navbar-nav">
-    <li className="nav-item">
-        <a className="nav-link" href="#">ورود آرایشگران</a>
-    </li>
-      </ul> */}
-  
-    <LoginHomeBtn targetPath="/login" title="ورود کاربران"/>
-    <LoginHomeBtn targetPath="/LoginAdmin" title="ورود ادمین"/>
+
+    <LoginHomeBtn targetPath="/login" title="ورود کاربران" showUserNameIfLoggedIn={true}/>
+    {/* <LoginHomeBtn targetPath="/LoginAdmin" title="ورود ادمین" showUserNameIfLoggedIn={false}/> */}
+
+    {/* <LoginHomeBtn  onClick={logOut} title="خروج" showUserNameIfLoggedIn={false}/> */}
+
      
    </form>
   )

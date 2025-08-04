@@ -1,0 +1,104 @@
+.topMenuMobile {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1000;
+  padding: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navList {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  width: 300px;
+  height: 100vh;
+  background: white;
+  transition: right 0.3s ease;
+  z-index: 1001;
+  overflow-y: auto;
+}
+
+.showMenuMobile {
+  right: 0;
+}
+
+.navMobile {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: none;
+}
+
+.showMenuMobile.navMobile {
+  display: block;
+}
+
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1002;
+}
+
+.category-wrapper {
+  position: relative;
+}
+
+.submenu {
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  margin-top: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+
+}
+
+.submenu ul {
+  margin: 0;
+  padding: 8px 0;
+}
+
+.submenu li {
+  padding: 4px 12px;
+}
+
+.submenu li:hover {
+
+  background-color: #d3d5d6;
+}
+
+.submenu a {
+  display: block;
+  padding: 4px 0;
+  font-size: 0.9rem;
+}
+
+/* Animation for submenu */
+.submenu {
+  animation: slideDown 0.2s ease;
+}
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Rotate arrow icon */
+.fa-angle-down {
+  transition: transform 0.3s ease;
+}
+
+.fa-angle-left {
+  transition: transform 0.3s ease;
+}

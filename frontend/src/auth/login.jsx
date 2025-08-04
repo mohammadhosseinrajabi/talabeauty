@@ -1,121 +1,149 @@
-import React, { useEffect, useState } from 'react';
-import { Formik, Form, Field } from 'formik';
-import * as Yup from 'yup';
-import axios from 'axios';
-import './login.css';
-import { NavLink } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from "react";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
+import axios from "axios";
+import "./login.css";
+import { Navigate, NavLink, useNavigate } from "react-router-dom";
+import { Alert } from "../utils/alert";
+import AxiosExclusive from "../components/axiosConfig";
+import AuthContext from "../context/AuthContext";
 
 // Validation schema
 const validationSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('ایمیل نامعتبر است')
-    .required('ایمیل الزامی است'),
+  email: Yup.string().email("ایمیل نامعتبر است").required("ایمیل الزامی است"),
   password: Yup.string()
-    .min(6, 'رمز عبور باید حداقل 6 کاراکتر باشد')
-    .required('رمز عبور الزامی است'),
-  captcha: Yup.string()
-    .required('کد کپچا الزامی است')
+    .min(6, "رمز عبور باید حداقل 6 کاراکتر باشد")
+    .required("رمز عبور الزامی است"),
+  captcha: Yup.string().required("کد کپچا الزامی است"),
 });
 
 const Login = () => {
-  const [captchaImage, setCaptchaImage] = useState('');
-  const [captchaId, setCaptchaId] = useState('');
-  const [error, setError] = useState('');
+  const [captchaImage, setCaptchaImage] = useState("");
+  const [captchaId, setCaptchaId] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [successMessage, setSuccessMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState("");
+  const navigate = useNavigate();
+  const {login}=useContext(AuthContext)
 
-  // Fetch new captcha on component mount
   useEffect(() => {
     fetchCaptcha();
   }, []);
 
-  // Fetch captcha from backend
+  useEffect(() => {
+    if (error) {
+      Alert("خطا", "error", error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (successMessage) {
+      Alert("ورود موفق", "success", successMessage);
+    }
+  }, [successMessage]);
+
   const fetchCaptcha = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/captcha/generate');
+      const response = await AxiosExclusive.get("/captcha/generate");
       if (response.data.success) {
         setCaptchaImage(response.data.captchaImage);
         setCaptchaId(response.data.captchaId);
-        setError('');
       } else {
-        throw new Error('خطا در دریافت کپچا');
+        throw new Error("خطا در دریافت کپچا");
       }
     } catch (err) {
-      setError('خطا در دریافت کپچا');
+      setError("خطا در دریافت کپچا");
     }
   };
 
-  // Handle form submission
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
     try {
       setIsLoading(true);
-      setError('');
-      setSuccessMessage('');
 
       // Step 1: Verify captcha
-      const captchaResponse = await axios.post('http://localhost:5000/api/captcha/verify', {
+      const captchaResponse = await AxiosExclusive.post("/captcha/verify", {
         captchaId: captchaId,
-        captchaText: values.captcha
+        captchaText: values.captcha,
       });
 
+     
+
       if (!captchaResponse.data.success || !captchaResponse.data.isValid) {
-        setError('کد کپچا اشتباه است');
-        fetchCaptcha(); // Get new captcha
+        setError("کد کپچا اشتباه است");
+        fetchCaptcha(); // Refresh captcha
+        setSubmitting(false);
+        setIsLoading(false);
         return;
       }
 
       // Step 2: Attempt login
-      const loginResponse = await axios.post('http://localhost:5000/api/customers/login', {
+      const loginResponse = await AxiosExclusive.post("/customers/login", {
         email: values.email,
-        password: values.password
+        password: values.password,
       });
 
+      
+
       if (loginResponse.data.success) {
-        // Store token and user data
-        localStorage.setItem('token', loginResponse.data.token);
-        localStorage.setItem('user', JSON.stringify(loginResponse.data.customer));
-        
-        setSuccessMessage('ورود با موفقیت انجام شد');
+        login(loginResponse.data.token,loginResponse.data.customer)
+        // localStorage.setItem("tokenUserLogin", loginResponse.data.token);
+        // localStorage.setItem(
+        //   "user",
+        //   JSON.stringify(loginResponse.data.customer)
+        // );
+      
+        setSuccessMessage("ورود با موفقیت انجام شد");
         resetForm();
-        
-        // Clear success message after 3 seconds
+
         setTimeout(() => {
-          setSuccessMessage('');
-        }, 3000);
+          navigate("/home");
+        }, 2000);
+      } else {
+        setError("ورود ناموفق بود");
+        fetchCaptcha();
       }
     } catch (err) {
-      console.error('Login error:', err);
-      const errorMessage = err.response?.data?.message || 'خطا در ورود به سیستم';
+      console.error("❌ Error during login process:", err);
+      const errorMessage =
+        err.response?.data?.message || "خطا در ورود به سیستم";
       setError(errorMessage);
-      fetchCaptcha(); // Get new captcha on error
+      fetchCaptcha();
     } finally {
-      setSubmitting(true);
+      setSubmitting(false);
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="login-container" dir='rtl'>
+    <div className="login-container">
       <div className="login-left">
         <div className="login-text">
           <h1>ورود مشتریان</h1>
-          <p>برای دسترسی به امکانات فروشگاه، لطفاً وارد حساب کاربری خود شوید.</p>
+          <p>
+            برای دسترسی به امکانات فروشگاه، لطفاً وارد حساب کاربری خود شوید.
+          </p>
           <p>این صفحه مخصوص ورود مشتریان می‌باشد.</p>
         </div>
       </div>
 
-      <div className="login-right">
+      <div className="login-right" dir="rtl">
         <div className="login-form-container">
           <div className="login-form-header">
             <h2>ورود به حساب کاربری</h2>
             <p>لطفاً اطلاعات خود را وارد کنید</p>
           </div>
 
-          {error && <div className="error-message">{error}</div>}
-          {successMessage && <div className="success-message">{successMessage}</div>}
+          {
+            // <div className="error-message">{error}
+            // </div>}
+          }
+
+          {/* {successMessage && (
+            <div className="success-message">{successMessage}</div>
+          )} */}
 
           <Formik
-            initialValues={{ email: '', password: '', captcha: '' }}
+            initialValues={{ email: "", password: "", captcha: "" }}
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
@@ -153,7 +181,14 @@ const Login = () => {
                   <label>کد امنیتی</label>
                   <div className="captcha-wrapper">
                     <div className="captcha-image">
-                      {captchaImage && <img src={`data:image/svg+xml;base64,${btoa(captchaImage)}`} alt="captcha" />}
+                      {captchaImage && (
+                        <img
+                          src={`data:image/svg+xml;base64,${btoa(
+                            captchaImage
+                          )}`}
+                          alt="captcha"
+                        />
+                      )}
                     </div>
                     <button
                       type="button"
@@ -180,7 +215,7 @@ const Login = () => {
                   className="submit-button"
                   disabled={isSubmitting || isLoading}
                 >
-                  {isLoading ? 'در حال ورود...' : 'ورود به حساب کاربری'}
+                  {isLoading ? "در حال ورود..." : "ورود به حساب کاربری"}
                 </button>
               </Form>
             )}
@@ -188,7 +223,7 @@ const Login = () => {
 
           <div className="login-links">
             <p>
-              حساب کاربری ندارید؟{' '}
+              حساب کاربری ندارید؟{" "}
               <NavLink to="/customersignup" className="signup-link">
                 ثبت نام کنید
               </NavLink>

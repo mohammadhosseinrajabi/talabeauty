@@ -6,9 +6,13 @@ import LightLoading from "../components/spinner/lightLoading";
 import axios from "axios";
 import * as Yup from 'yup';
 import './signup.css';
+import { Alert } from "../utils/alert";
+import { useNavigate } from "react-router-dom";
 
 
 export default function CustomerSignup() {
+  const navigate = useNavigate();
+
   const initialValues = {
     firstName: "",
     lastName: "",
@@ -54,9 +58,11 @@ export default function CustomerSignup() {
   const onSubmit = (values, { setSubmitting }) => {
     axios.post('http://localhost:5000/api/customers/signup', values)
       .then((res) => {
-        alert("ثبت نام شما با موفقیت انجام شد.");
-        localStorage.setItem("token", res.data.token);
-        window.location.href = '/admin';
+        setTimeout(() => {
+          Alert("ثبت نام شما با موفقیت انجام شد","success");
+          localStorage.setItem("token", res.data.token);
+          navigate("/home")
+        }, 3000);
       })
       .catch((error) => {
         if (error.response) {
@@ -69,7 +75,6 @@ export default function CustomerSignup() {
         setSubmitting(false);
       });
   };
-
   return (
     <div className="signup-page" >
       <div className="signup-image-section">
@@ -178,7 +183,7 @@ export default function CustomerSignup() {
                     <FormikControl
                       control="input"
                       type="text"
-                      label="شهر"
+                      label="شهرشما"
                       name="address.city"
                       className="form-input"
                       placeholder="شهر محل سکونت"

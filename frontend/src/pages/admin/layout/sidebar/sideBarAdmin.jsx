@@ -22,12 +22,12 @@ export default function SideBarAdmin() {
           <SidebarGroupItem title="فروشگاه" />
           <SidebarItem targetPath="/admin/category" title="مدیریت دسته بندی آرایشگاه ها" icon="fas fa-stream" />
 
-          <SidebarItem targetPath="/admin/product" title="مدیریت رزور" icon="fas fa-stream" />
+          <SidebarItem targetPath="/admin/product" title="مدیریت محصول" icon="fas fa-stream" />
 
           {/* <!-- =================================== --> */}
 
-          <SidebarGroupItem title="درخواست رزور ها" />
-          <SidebarItem targetPath="/admin/" title="مدیریت رزور" icon="fas fa-stream" />
+          <SidebarGroupItem title="آرایشگران" />
+          <SidebarItem targetPath="/admin/stylist" title="مدیریت آرایشگران" icon="fas fa-stream" />
 
           {/* <!-- =================================== --> */}
 

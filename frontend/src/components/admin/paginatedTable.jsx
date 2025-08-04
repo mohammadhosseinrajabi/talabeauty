@@ -84,11 +84,11 @@ export default function PaginatedTable({ dataInfo, data = [], additionField , ch
 
       ):(
         tableData.map((d) => (
-          <tr key={d.id}>
+          <tr key={d._id}>
             {dataInfo.map((i) => (
-              <td key={i.field + "_" + d.id}>{d[i.field]}</td>
+              <td key={i.field + "_" + d._id}>{d[i.field]}</td>
             ))}
-            {additionField ? <td>{additionField.elements(d.id)}</td> : null}
+            {additionField ? <td>{additionField.elements(d)}</td> : null}
           </tr>
         ))
       )

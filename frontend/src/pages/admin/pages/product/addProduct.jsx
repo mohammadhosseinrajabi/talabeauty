@@ -1,236 +1,333 @@
-import React from "react";
+import React, { useContext, useEffect, useState } from "react";
+import { Formik, Form, Field } from "formik";
+import * as Yup from "yup";
 import ModalsContainer from "../../../../components/admin/modalsContainer";
-//هنوز setForceRender را درست نکردم یادم باشه
-export default function AddProduct({setForceRender}) {
+import axios from "axios";
+import { Alert } from "../../../../utils/alert";
+import { getCategory } from "../../../../context/getCategoryContext";
+import { ProductsContext } from "../../../../context/productsContext";
+import { useParams } from "react-router-dom";
+
+// Validation Schema
+const ProductSchema = Yup.object().shape({
+  category: Yup.string().required("دسته‌بندی الزامی است"),
+  name: Yup.string()
+    .required("عنوان محصول الزامی است")
+    .min(2, "عنوان محصول باید حداقل 2 کاراکتر باشد"),
+  price: Yup.number()
+    .required("قیمت الزامی است")
+    .positive("قیمت باید مثبت باشد"),
+  description: Yup.string()
+    .required("توضیحات الزامی است")
+    .min(10, "توضیحات باید حداقل 10 کاراکتر باشد"),
+  images: Yup.array().of(Yup.mixed()).required("تصویر الزامی است"),
+  stock: Yup.number()
+    .required("موجودی الزامی است")
+    .integer("موجودی باید عدد صحیح باشد")
+    .min(0, "موجودی نمی‌تواند منفی باشد"),
+});
+
+export default function AddProduct() {
+  const [selectedColors, setSelectedColors] = useState([]);
+  const [selectedWarranties, setSelectedWarranties] = useState([]);
+  const { categories } = useContext(getCategory);
+  const [editProduct, setEditProduct] = useState(null);
+  const [reInitialValues, setreInitialValues] = useState();
+  const params = useParams();
+
+  const { editID, setEditId } = useContext(ProductsContext);
+  const initialValues = {
+    name: "",
+    description: "",
+    price: "",
+    category: "",
+    images: [],
+    stock: "",
+  };
+
+const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+  const token = localStorage.getItem("token");
+
+  try {
+    const formData = new FormData();
+    formData.append("name", values.name.trim());
+    formData.append("description", values.description.trim());
+    formData.append("price", values.price);
+    formData.append("category", values.category);
+    formData.append("stock", values.stock);
+
+    // اضافه کردن عکس‌ها
+    values.images.forEach((img) => {
+      formData.append("images", img);
+    });
+
+    if (editID) {
+      const res = await axios.put(
+        `http://localhost:5000/api/products/${editID}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (res.status === 200) {
+        Alert("محصول با موفقیت ویرایش شد", "success");
+        resetForm();
+        setEditId(null);
+      }
+    } else {
+      const res = await axios.post(
+        "http://localhost:5000/api/products",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      if (res.status === 201) {
+        Alert("محصول با موفقیت اضافه شد", "success");
+        resetForm();
+      }
+    }
+  } catch (error) {
+    console.error("Error in handleSubmit:", error);
+    console.error("Error details:", error.response?.data);
+
+    if (error.response?.data?.errors) {
+      const errorMessages = error.response.data.errors
+        .map((err) => err.msg)
+        .join("\n");
+      Alert("خطا در ثبت محصول", errorMessages, "error");
+    } else if (error.response?.data?.message) {
+      Alert("خطا در ارسال اطلاعات", error.response.data.message, "error");
+    } else {
+      Alert("خطا در ارسال اطلاعات", "خطای ناشناخته رخ داد", "error");
+    }
+  } finally {
+    setSubmitting(false);
+  }
+};
+
+
+  const handleGetsingleproduct = async () => {
+  
+    const token = localStorage.getItem("token");
+    try {
+      const res = await axios.get(
+        `http://localhost:5000/api/products/${editID}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+  
+      if (res.status === 200) {
+   
+        setEditProduct(res.data);
+      } else {
+   
+        setEditProduct(null);
+      }
+    } catch (error) {
+      console.error("Error in handleGetsingleproduct:", error);
+      console.error("Error details:", error.response?.data);
+      Alert("مشکل دسته بندی مورد نظر یافت نشد", "warning");
+    }
+  };
+  useEffect(() => {
+
+    if (editID) {
+      handleGetsingleproduct();
+    } else {
+    
+      setEditProduct(null);
+    }
+  }, [editID]);
+
+  useEffect(() => {
+    if (params.cate) {
+      handleGetsingleproduct();
+    }
+  }, [params.cate]);
+
+ useEffect(() => {
+    if (editProduct) {
+
+      const newValues = {
+        name: editProduct.name,
+        description: editProduct.description,
+        price: editProduct.price || "",
+        category: typeof editProduct.category === 'object' ? editProduct.category._id : editProduct.category,
+        images: editProduct.images || [],
+        stock: editProduct.stock
+      };
+   
+      setreInitialValues(newValues);
+    } else {
+
+      setreInitialValues(null);
+    }
+}, [editProduct]);
+
+// if (editID && !reInitialValues) {
+//   return <div className="text-center p-5">در حال بارگذاری اطلاعات محصول...</div>;
+// }
+
   return (
-     <ModalsContainer
-           FullScreen={true}
-           id="add_product_modal" 
-           title="افزودن محصول جدیسسد"
+    <ModalsContainer
+      FullScreen={true}
+      id="add_product_modal"
+      title="افزودن محصول جدید"
     >
-      <div className="container">
-        <div className="row justify-content-center">
-          <div className="col-12 col-md-6 col-lg-8">
-            <div className="input-group mb-2 dir_ltr">
-              <select type="text" className="form-control">
-                <option value="1">انتخاب دسته محصول</option>
-                <option value="1">دسته شماره 1</option>
-              </select>
-              <span className="input-group-text w_6rem justify-content-center">
-                دسته
-              </span>
+      
+      <Formik
+        initialValues={reInitialValues || initialValues}
+        enableReinitialize={true}
+        validationSchema={ProductSchema}
+        onSubmit={handleSubmit}
+      >
+        {({ errors, touched, isSubmitting, setFieldValue }) => (
+          <Form className="container">
+            <div className="row justify-content-center">
+              <div className="col-12 col-md-6 col-lg-8">
+                <div className="input-group mb-2 dir_ltr">
+                  <Field
+                    as="select"
+                    name="category"
+                    className={`form-control ${
+                      errors.category && touched.category ? "is-invalid" : ""
+                    }`}
+                  >
+                    <option value="">انتخاب دسته محصول</option>
+                    {categories.map((category) => (
+                      <option key={category._id} value={category._id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </Field>
+                  <span className="input-group-text w_6rem justify-content-center">
+                    دسته
+                  </span>
+                  {errors.category && touched.category && (
+                    <div className="invalid-feedback">{errors.category}</div>
+                  )}
+                </div>
+              </div>
+              <div className="col-12 col-md-6 col-lg-8">
+                <div className="input-group my-3 dir_ltr">
+                  <Field
+                    type="text"
+                    name="name"
+                    className={`form-control ${
+                      errors.name && touched.name ? "is-invalid" : ""
+                    }`}
+                    placeholder="عنوان محصول"
+                  />
+                  <span className="input-group-text w_6rem justify-content-center">
+                    عنوان
+                  </span>
+                  {errors.name && touched.name && (
+                    <div className="invalid-feedback">{errors.name}</div>
+                  )}
+                </div>
+              </div>
+              <div className="col-12 col-md-6 col-lg-8">
+                <div className="input-group mb-3 dir_ltr">
+                  <Field
+                    type="number"
+                    name="price"
+                    className={`form-control ${
+                      errors.price && touched.price ? "is-invalid" : ""
+                    }`}
+                    placeholder="قیمت محصول"
+                  />
+                  <span className="input-group-text w_6rem justify-content-center">
+                    قیمت
+                  </span>
+                  {errors.price && touched.price && (
+                    <div className="invalid-feedback">{errors.price}</div>
+                  )}
+                </div>
+              </div>
+              <div className="col-12 col-md-6 col-lg-8">
+                <div className="input-group mb-3 dir_ltr">
+                  <Field
+                    as="textarea"
+                    name="description"
+                    className={`form-control ${
+                      errors.description && touched.description
+                        ? "is-invalid"
+                        : ""
+                    }`}
+                    placeholder="توضیحات"
+                    rows="5"
+                  />
+                  <span className="input-group-text w_6rem justify-content-center">
+                    توضیحات
+                  </span>
+                  {errors.description && touched.description && (
+                    <div className="invalid-feedback">{errors.description}</div>
+                  )}
+                </div>
+              </div>
+              <div className="col-12 col-md-6 col-lg-8">
+                <div className="input-group mb-3 dir_ltr">
+                  <input
+                    type="file"
+                    className={`form-control ${
+                      errors.images && touched.images ? "is-invalid" : ""
+                    }`}
+                    onChange={(event) => {
+                      const files = Array.from(event.currentTarget.files);
+                      setFieldValue("images", files);
+                    }}
+                  />
+                  <span className="input-group-text w_6rem justify-content-center">
+                    تصویر
+                  </span>
+                  {errors.images && touched.images && (
+                    <div className="invalid-feedback">{errors.images}</div>
+                  )}
+                </div>
+              </div>
+              <div className="col-12 col-md-6 col-lg-8">
+                <div className="input-group mb-3 dir_ltr">
+                  <Field
+                    type="number"
+                    name="stock"
+                    className={`form-control ${
+                      errors.stock && touched.stock ? "is-invalid" : ""
+                    }`}
+                    placeholder="موجودی"
+                  />
+                  <span className="input-group-text w_6rem justify-content-center">
+                    موجودی
+                  </span>
+                  {errors.stock && touched.stock && (
+                    <div className="invalid-feedback">{errors.stock}</div>
+                  )}
+                </div>
+              </div>
+              <div className="btn_box text-center col-12 col-md-6 col-lg-8 mt-4">
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? "در حال ثبت..." : "ذخیره"}
+                </button>
+              </div>
             </div>
-            <div className="col-12 col-md-6 col-lg-8">
-              <span className="chips_elem">
-                <i className="fas fa-times text-danger"></i>
-                دسته فلان
-              </span>
-              <span className="chips_elem">
-                <i className="fas fa-times text-danger"></i>
-                دسته فلان
-              </span>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-lg-8">
-            <div className="input-group my-3 dir_ltr">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="عنوان محصول"
-              />
-              <span className="input-group-text w_6rem justify-content-center">
-                عنوان
-              </span>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-lg-8">
-            <div className="input-group mb-3 dir_ltr">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="قیمت محصول"
-              />
-              <span className="input-group-text w_6rem justify-content-center">
-                قیمت
-              </span>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-lg-8">
-            <div className="input-group mb-3 dir_ltr">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="وزن محصول (کیلوگرم)"
-              />
-              <span className="input-group-text w_6rem justify-content-center">
-                وزن
-              </span>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-lg-8">
-            <div className="input-group mb-3 dir_ltr">
-              <span className="input-group-text justify-content-center">
-                <i className="fas fa-plus text-success hoverable_text pointer"></i>
-              </span>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="قسمتی از نام برند را وارد کنید"
-                list="brandLists"
-              />
-              <span className="input-group-text w_6rem justify-content-center">
-                برند
-              </span>
-              <datalist id="brandLists">
-                <option value="سامسونگ"></option>
-                <option value="سونی"></option>
-                <option value="اپل"></option>
-              </datalist>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-lg-8">
-            <div className="input-group mb-2 dir_ltr">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="قسمتی از نام رنگ را وارد کنید"
-                list="colorList"
-              />
-              <datalist id="colorList">
-                <option value="مشکی"></option>
-                <option value="سفید"></option>
-                <option value="قرمز"></option>
-              </datalist>
-
-              <span className="input-group-text w_6rem justify-content-center">
-                رنگ
-              </span>
-            </div>
-            <div className="col-12 col-md-6 col-lg-8 mb-3 d-flex">
-              <span className="color_tag chips_elem d-flex justify-content-center align-items-center pb-2">
-                <i className="fas fa-times text-danger hoverable_text"></i>
-              </span>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-lg-8">
-            <div className="input-group mb-2 dir_ltr">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="قسمتی از نام گارانتی را وارد کنید"
-                list="guarantiList"
-              />
-              <datalist id="guarantiList">
-                <option value="گارانتی فلان 1"></option>
-                <option value="گارانتی فلان 2"></option>
-                <option value="گارانتی فلان 3"></option>
-              </datalist>
-
-              <span className="input-group-text w_6rem justify-content-center">
-                گارانتی
-              </span>
-            </div>
-            <div className="col-12 col-md-6 col-lg-8 mb-3">
-              <span className="chips_elem">
-                <i className="fas fa-times text-danger"></i>
-                گارانتی فلان
-              </span>
-              <span className="chips_elem">
-                <i className="fas fa-times text-danger"></i>
-                گارانتی فلان
-              </span>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-lg-8">
-            <div className="input-group mb-3 dir_ltr">
-              <textarea
-                type="text"
-                className="form-control"
-                placeholder="توضیحات"
-                rows="5"
-              ></textarea>
-              <span className="input-group-text w_6rem justify-content-center">
-                توضیحات
-              </span>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-lg-8">
-            <div className="input-group mb-3 dir_ltr">
-              <input type="file" className="form-control" placeholder="تصویر" />
-              <span className="input-group-text w_6rem justify-content-center">
-                تصویر
-              </span>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-lg-8">
-            <div className="input-group mb-3 dir_ltr">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="یک کلمه در مورد تصویر"
-              />
-              <span className="input-group-text w_6rem justify-content-center">
-                توضیح تصویر
-              </span>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-lg-8">
-            <div className="input-group mb-3 dir_ltr">
-              <input
-                type="text"
-                className="form-control"
-                placeholder="با - از هم جدا شوند"
-              />
-              <span className="input-group-text w_6rem justify-content-center">
-                تگ ها
-              </span>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-lg-8">
-            <div className="input-group mb-3 dir_ltr">
-              <input
-                type="number"
-                className="form-control"
-                placeholder="فقط عدد"
-              />
-              <span className="input-group-text w_6rem justify-content-center">
-                موجودی
-              </span>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-lg-8">
-            <div className="input-group mb-3 dir_ltr">
-              <input
-                type="number"
-                className="form-control"
-                placeholder="فقط عدد "
-              />
-              <span className="input-group-text w_6rem justify-content-center">
-                درصد تخفیف
-              </span>
-            </div>
-          </div>
-          <div className="col-12 col-md-6 col-lg-8 row justify-content-center">
-            <div className="form-check form-switch col-5 col-md-2">
-              <input
-                className="form-check-input pointer"
-                type="checkbox"
-                id="flexSwitchCheckDefault"
-             
-              />
-              <label
-                className="form-check-label pointer"
-                htmlFor="flexSwitchCheckDefault"
-              >
-                وضعیت فعال
-              </label>
-            </div>
-          </div>
-          <div className="btn_box text-center col-12 col-md-6 col-lg-8 mt-4">
-            <button className="btn btn-primary">ذخیره</button>
-          </div>
-        </div>
-      </div>
+          </Form>
+        )}
+      </Formik>
     </ModalsContainer>
   );
 }
