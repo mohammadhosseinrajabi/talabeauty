@@ -15,7 +15,6 @@ export default function ShoppingCart() {
   const { items, subtotal, removeItem, updateQty, clearCart } = useCart();
   return (
     <>
-    
       <NavDesktop />
       <TopMenuMobile />
       <br />
