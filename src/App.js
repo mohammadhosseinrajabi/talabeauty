@@ -17,6 +17,7 @@ import StylistPage from "./pages/stylistPage/stylistPage";
 import ShopingCart from "./pages/shopping cart/shoppingCart";
 import { CartProvider } from "./context/cartContext";
 
+
 function App() {
   const { ProtectedRouteLogin } = useContext(AuthContext);
   return (
@@ -39,6 +40,8 @@ function App() {
               <Route path="/home" element={<HomeNew />} />
               <Route path="/ProductPage/:id" element={<ProductsPage />} />
               <Route path="/StylistPage/:id" element={<StylistPage />} />
+      
+
 
               <Route
                 path="/admin/*"
