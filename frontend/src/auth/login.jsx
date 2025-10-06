@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-import axios from "axios";
 import "./login.css";
-import { Navigate, NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { Alert } from "../utils/alert";
 import AxiosExclusive from "../components/axiosConfig";
 import AuthContext from "../context/AuthContext";
@@ -24,7 +23,7 @@ const Login = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
-  const {login}=useContext(AuthContext)
+  const { login } = useContext(AuthContext);
 
   useEffect(() => {
     fetchCaptcha();
@@ -66,8 +65,6 @@ const Login = () => {
         captchaText: values.captcha,
       });
 
-     
-
       if (!captchaResponse.data.success || !captchaResponse.data.isValid) {
         setError("کد کپچا اشتباه است");
         fetchCaptcha(); // Refresh captcha
@@ -82,16 +79,14 @@ const Login = () => {
         password: values.password,
       });
 
-      
-
       if (loginResponse.data.success) {
-        login(loginResponse.data.token,loginResponse.data.customer)
+        login(loginResponse.data.token, loginResponse.data.customer);
         // localStorage.setItem("tokenUserLogin", loginResponse.data.token);
         // localStorage.setItem(
         //   "user",
         //   JSON.stringify(loginResponse.data.customer)
         // );
-      
+
         setSuccessMessage("ورود با موفقیت انجام شد");
         resetForm();
 
@@ -122,7 +117,6 @@ const Login = () => {
           <p>
             برای دسترسی به امکانات فروشگاه، لطفاً وارد حساب کاربری خود شوید.
           </p>
-          <p>این صفحه مخصوص ورود مشتریان می‌باشد.</p>
         </div>
       </div>
 

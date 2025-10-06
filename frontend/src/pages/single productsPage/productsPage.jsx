@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import {
   FaShoppingCart,
   FaStar,
@@ -21,12 +21,15 @@ import TopMenuMobile from "../../navbar/topMenuMobile";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import AxiosExclusive from "../../components/axiosConfig";
+import { useCart } from "../../context/cartContext";
+import { Alert } from "../../utils/alert";
 
 const ProductsPage = () => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
   const { id } = useParams();
+  const {addItem }=useCart();
 
   useEffect(() => {
     
@@ -54,6 +57,8 @@ const ProductsPage = () => {
     <div dir="rtl">
       <NavDesktop />
       <TopMenuMobile />
+
+
 
       <div className="product-detail-page">
         <div className="product-container">
@@ -92,14 +97,17 @@ const ProductsPage = () => {
             </div>
             <p className="product-description">{product.description}</p>
             
-            <div className="product-actions">
-              <div className="quantity-selector">
+            <div className="product-actions w-50 container">
+              {/* <div className="quantity-selector">
                 <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
                 <span>{quantity}</span>
                 <button onClick={() => setQuantity(quantity + 1)}>+</button>
-              </div>
-              <button className="add-to-cart-btn">
-                <FaShoppingCart /> افزودن به سبد خرید به زودی فعال میشود
+              </div> */}
+              <button className="add-to-cart-btn" onClick={async()=>{await addItem(product._id)
+                Alert("به سبد خرید شما اضافه شد","success")
+              }}>
+                <FaShoppingCart /> افزودن به سبد خرید
+
               </button>
             </div>
 

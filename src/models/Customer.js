@@ -61,7 +61,12 @@ customerSchema.pre('save', async function(next) {
 
 // Method to compare password
 customerSchema.methods.comparePassword = async function(candidatePassword) {
-    return bcrypt.compare(candidatePassword, this.password);
+    try {
+        return await bcrypt.compare(candidatePassword, this.password);
+    } catch (error) {
+        console.error('Error comparing password:', error);
+        throw error;
+    }
 };
 
 module.exports = mongoose.model('Customer', customerSchema); 

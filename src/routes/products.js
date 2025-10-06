@@ -2,6 +2,39 @@ const express = require('express');
 const router = express.Router();
 const { body, validationResult } = require('express-validator');
 const Product = require('../models/Product');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+// Configure multer for file upload
+
+const uploadDir = path.join(__dirname, '..', 'uploads');
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: function (req, file, cb) {
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storage,
+  fileFilter: function (req, file, cb) {
+    if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
+      return cb(new Error('Only image files are allowed!'), false);
+    }
+    cb(null, true);
+  },
+  limits: {
+    fileSize: 5 * 1024 * 1024 // 5MB limit
+  }
+});
 
 // Get all products
 router.get('/', async (req, res) => {
@@ -45,10 +78,26 @@ router.get('/', async (req, res) => {
       .skip((page - 1) * limit)
       .populate('category', 'name');
 
+    // Transform image URLs to include full path
+    const transformedProducts = products.map(product => {
+      const productObj = product.toObject();
+      if (productObj.images && productObj.images.length > 0) {
+        productObj.images = productObj.images.map(image => {
+          // If the image path already includes /uploads, return it as is
+          if (image.startsWith('/uploads/')) {
+            return image;
+          }
+          // Otherwise, add /uploads prefix
+          return `/uploads/${image}`;
+        });
+      }
+      return productObj;
+    });
+
     const total = await Product.countDocuments(query);
 
     res.json({
-      products,
+      products: transformedProducts,
       totalPages: Math.ceil(total / limit),
       currentPage: page
     });
@@ -77,12 +126,11 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create product (admin only)
-router.post('/', [
+router.post('/', upload.array('images', 5), [
   body('name').trim().notEmpty().withMessage('Name is required'),
   body('description').notEmpty().withMessage('Description is required'),
   body('price').isNumeric().withMessage('Price must be a number'),
   body('category').isMongoId().withMessage('Valid category ID is required'),
-  body('images').isArray().withMessage('Images must be an array'),
   body('stock').isInt({ min: 0 }).withMessage('Stock must be a non-negative number')
 ], async (req, res) => {
   try {
@@ -91,23 +139,38 @@ router.post('/', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const product = new Product(req.body);
+    console.log('Request body:', req.body);
+    console.log('Uploaded files:', req.files);
+
+    const productData = {
+      ...req.body,
+      images: req.files ? req.files.map(file => `/uploads/${file.filename}`) : []
+    };
+
+    console.log('Product data with images:', productData);
+
+    const product = new Product(productData);
     await product.save();
 
-    res.status(201).json(product);
+    // Transform image URLs in response
+    const productObj = product.toObject();
+    if (productObj.images && productObj.images.length > 0) {
+      productObj.images = productObj.images.map(image => image);
+    }
+
+    res.status(201).json(productObj);
   } catch (error) {
-    console.error(error);
+    console.error('Error creating product:', error);
     res.status(500).json({ message: 'Server error' });
   }
 });
 
 // Update product (admin only)
-router.put('/:id', [
+router.put('/:id', upload.array('images'), [
   body('name').optional().trim().notEmpty(),
   body('description').optional().notEmpty(),
   body('price').optional().isNumeric(),
   body('category').optional().isMongoId(),
-  body('images').optional().isArray(),
   body('stock').optional().isInt({ min: 0 })
 ], async (req, res) => {
   try {
@@ -116,9 +179,14 @@ router.put('/:id', [
       return res.status(400).json({ errors: errors.array() });
     }
 
+    const updateData = { ...req.body };
+    if (req.files && req.files.length > 0) {
+      updateData.images = req.files.map(file => file.filename);
+    }
+
     const product = await Product.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body },
+      { $set: updateData },
       { new: true, runValidators: true }
     );
 
@@ -126,7 +194,16 @@ router.put('/:id', [
       return res.status(404).json({ message: 'Product not found' });
     }
 
-    res.json(product);
+    // Transform image URLs in response
+    const productObj = product.toObject();
+    if (productObj.images && productObj.images.length > 0) {
+      productObj.images = productObj.images.map(image => {
+        // Ensure the image path starts with /uploads
+        return image.startsWith('/uploads') ? image : `/uploads/${image}`;
+      });
+    }
+
+    res.json(productObj);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Server error' });

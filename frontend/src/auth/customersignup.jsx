@@ -8,6 +8,7 @@ import * as Yup from 'yup';
 import './signup.css';
 import { Alert } from "../utils/alert";
 import { useNavigate } from "react-router-dom";
+import AxiosExclusive from "../components/axiosConfig";
 
 
 export default function CustomerSignup() {
@@ -56,7 +57,7 @@ export default function CustomerSignup() {
   });
 
   const onSubmit = (values, { setSubmitting }) => {
-    axios.post('http://localhost:5000/api/customers/signup', values)
+    AxiosExclusive.post('/customers/signup', values)
       .then((res) => {
         setTimeout(() => {
           Alert("ثبت نام شما با موفقیت انجام شد","success");

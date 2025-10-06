@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Formik, Form, Field } from "formik";
 import * as Yup from "yup";
-import axios from "axios";
 import "./login.css";
-import { NavLink } from "react-router-dom";
+import AxiosExclusive from "../components/axiosConfig";
+import { Alert } from "../utils/alert";
 
 const validationSchema = Yup.object().shape({
   email: Yup.string().email("ایمیل نامعتبر است").required("ایمیل الزامی است"),
@@ -19,59 +19,103 @@ const LoginAdmin = () => {
   const [captchaImage, setCaptchaImage] = useState("");
   const [captchaId, setCaptchaId] = useState("");
   const [error, setError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+ 
 
   useEffect(() => {
     fetchCaptcha();
   }, []);
+  
+  useEffect(() => {
+    if (error) {
+      Alert("خطا", "error", error);
+      setError(""); 
+    }
+  }, [error]);
+  
+  useEffect(() => {
+    if (successMessage) {
+      Alert("ورود موفق", "success", successMessage);
+      setSuccessMessage(""); 
+    }
+  }, [successMessage]);
 
   const fetchCaptcha = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/captcha/generate"
-      );
+      const response = await AxiosExclusive.get("/captcha/generate");
       if (response.data.success) {
         setCaptchaImage(response.data.captchaImage);
         setCaptchaId(response.data.captchaId);
-        setError("");
       } else {
         throw new Error("خطا در دریافت کپچا");
       }
     } catch (err) {
+      console.error("Error fetching captcha:", err);
       setError("خطا در دریافت کپچا");
     }
   };
 
   const handleSubmit = async (values, { setSubmitting, resetForm }) => {
+    setIsLoading(true);
+    setError(""); 
+    
     try {
-      const response = await axios.post(
-        "http://localhost:5000/api/auth/admin/login",
-        {
-          email: values.email,
-          password: values.password,
-          captchaId: captchaId,
-          captchaText: values.captcha,
-        }
-      );
+      // Step 1: Verify captcha
+      const captchaResponse = await AxiosExclusive.post("/captcha/verify", {
+        captchaId,
+        captchaText: values.captcha,
+      });
 
-      if (response.data) {
-        localStorage.setItem("token", response.data.token);
+      if (!captchaResponse.data.success || !captchaResponse.data.isValid) {
+        setError("کد کپچا اشتباه است");
+        await fetchCaptcha();
+        return;
+      }
+
+      // Step 2: Attempt admin login
+      const loginAdminResponse = await AxiosExclusive.post("/auth/admin/login", {
+        email: values.email,
+        password: values.password,
+      });
+
+ 
+
+      
+      if (loginAdminResponse.data.token && loginAdminResponse.data.admin) {
+    
+        localStorage.setItem("token", loginAdminResponse.data.token);
         localStorage.setItem(
           "user",
           JSON.stringify({
-            id: response.data.admin.id,
-            name: response.data.admin.name,
-            email: response.data.admin.email,
-            role: response.data.admin.role,
+            id: loginAdminResponse.data.admin.id,
+            name: loginAdminResponse.data.admin.name,
+            email: loginAdminResponse.data.admin.email,
+            role: loginAdminResponse.data.admin.role,
           })
         );
-        alert("ورود با موفقیت انجام شد");
+        
+        setSuccessMessage("ورود با موفقیت انجام شد");
         resetForm();
-        navigate("/admin/dashboard");
+        
+        // Navigate to admin dashboard
+        setTimeout(() => {
+          navigate("/admin/dashboard");
+        }, 1000);
+      } else {
+       
+        const errorMessage = loginAdminResponse.data.message || "ورود ناموفق بود";
+        setError(errorMessage);
+        await fetchCaptcha();
       }
-    } catch (err) {
-      setError(err.response?.data?.message || "خطا در ورود به سیستم");
-      fetchCaptcha(); // در صورت خطا، کپچا جدید دریافت کن
+
+    } catch (error) {
+      console.error("Login error:", error);
+      const errorMessage = error?.response?.data?.message || "خطای ناشناخته در ورود";
+      setError(errorMessage);
+      await fetchCaptcha();
     } finally {
+      setIsLoading(false);
       setSubmitting(false);
     }
   };
@@ -91,8 +135,6 @@ const LoginAdmin = () => {
             <h2>ورود به پنل ادمین</h2>
             <p>لطفاً اطلاعات خود را وارد کنید</p>
           </div>
-
-          {error && <div className="error-message">{error}</div>}
 
           <Formik
             initialValues={{ email: "", password: "", captcha: "" }}
@@ -158,19 +200,13 @@ const LoginAdmin = () => {
                 <button
                   type="submit"
                   className="submit-button"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isLoading}
                 >
-                  {isSubmitting ? "در حال ورود..." : "ورود"}
+                  {isLoading ? "در حال ورود..." : "ورود به ادمین"}
                 </button>
               </Form>
             )}
           </Formik>
-          <div className="login-link">
-            <p>
-              اگر حساب ادمین ندارید،{" "}
-              <NavLink to="/signup">ثبت‌نام کنید</NavLink>
-            </p>
-          </div>
         </div>
       </div>
     </div>

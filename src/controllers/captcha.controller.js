@@ -48,30 +48,30 @@ const verifyCaptcha = async (req, res) => {
         const { captchaId, captchaText } = req.body;
 
         if (!captchaId || !captchaText) {
-            return {
+            return res.json({
                 success: false,
                 isValid: false,
                 message: 'شناسه کپچا و متن کپچا الزامی است'
-            };
+            });
         }
 
         const captchaData = captchaStore.get(captchaId);
 
         if (!captchaData) {
-            return {
+            return res.json({
                 success: false,
                 isValid: false,
                 message: 'کپچا نامعتبر یا منقضی شده است'
-            };
+            });
         }
 
         if (Date.now() > captchaData.expires) {
             captchaStore.delete(captchaId);
-            return {
+            return res.json({
                 success: false,
                 isValid: false,
                 message: 'کپچا منقضی شده است'
-            };
+            });
         }
 
         const isValid = captchaText.toLowerCase() === captchaData.text.toLowerCase();
@@ -79,17 +79,17 @@ const verifyCaptcha = async (req, res) => {
         // پاک کردن کپچا بعد از استفاده
         captchaStore.delete(captchaId);
 
-        return {
+        return res.json({
             success: true,
             isValid: isValid
-        };
+        });
     } catch (error) {
         console.error('خطا در اعتبارسنجی کپچا:', error);
-        return {
+        return res.json({
             success: false,
             isValid: false,
             message: 'خطا در اعتبارسنجی کپچا'
-        };
+        });
     }
 };
 

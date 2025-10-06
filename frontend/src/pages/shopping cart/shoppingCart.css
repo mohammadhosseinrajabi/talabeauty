@@ -1,0 +1,21 @@
+body{
+background-color: #e0e1e167 !important;
+}
+.imageThumbnailProduct{
+    border: 1px solid black;
+    width: 100px;
+    height: 120px;
+    border-radius: 9px;
+}
+/* .imageThumbnailProduct{
+    display: inline-block;
+} */
+.hrProduct{
+
+ margin: 10px auto !important;
+  width: 92% !important;
+  margin-top: 10px !important;
+}
+.Payment{
+    width: 91% !important;
+}

@@ -7,12 +7,18 @@ const path = require('path');
 // Load environment variables
 dotenv.config();
 
+// Set default JWT_SECRET for local development
+if (!process.env.JWT_SECRET) {
+    process.env.JWT_SECRET = 'your-local-development-secret-key';
+}
+
 const app = express();
 
 // CORS configuration
 const allowedOrigins = [
   'http://localhost:3000',
-  'https://beautysalon.jelvanii.ir'
+  'https://talabeauty.jelvanii.ir',
+  'https://mh.mtcoding.ir'
 ];
 
 app.use(cors({
@@ -29,21 +35,38 @@ app.use(cors({
 app.use(express.json());
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/eshop')
+mongoose.connect('mongodb://localhost:27017/eshop', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
-
+console.log('Current __dirname:', __dirname)
 // Routes
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/customers', require('./routes/customerRoutes'));
 app.use('/api/products', require('./routes/products'));
 app.use('/api/orders', require('./routes/orders'));
 app.use('/api/categories', require('./routes/categoryRoutes'));
+app.use('/api/articles', require('./routes/articleRoutes'));
 app.use('/api/barber-categories', require('./routes/barberCategoryRoutes'));
+// app.use('/api/barbershops', require('./routes/barbershopRoutes'));
+app.use('/api/cart', require('./routes/cartRoutes'));
+
 const captchaRoutes = require('./routes/captcha.routes');
+
+app.use('/api/stylists', require('./routes/stylists.js'));
+
 
 // مسیرهای کپچا
 app.use('/api/captcha', captchaRoutes);
+app.use('/api/upload', require('./routes/upload'));
+// Serve static files from uploads directory
+console.log('Serving uploads from:', path.join(__dirname, '..', 'uploads'));
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, 'src', 'uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
 
 // Serve static files in production
 if (process.env.NODE_ENV === 'production') {

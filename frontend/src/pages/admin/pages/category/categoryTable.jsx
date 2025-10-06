@@ -27,7 +27,7 @@ export default function CategoryTable() {
         Alert("خطا", res.data.message, "error");
       }
     } catch (err) {
-      console.error("Error fetching categories:", err);
+      
       Alert("خطا", "مشکل در ارتباط با سرور", "error");
     }
   };

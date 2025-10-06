@@ -11,7 +11,7 @@ import Products from "../components/ForHomePage/products";
 import OurCity from "../components/ForHomePage/ourCity";
 import Stylists from "../components/ForHomePage/stylists";
 import Footer from "../components/ForHomePage/footer";
-import ProductsPage from "../pages/productsPage/productsPage";
+import ProductsPage from "../pages/single productsPage/productsPage";
 
 const HomeNew = () => {
   const latestArticles = [

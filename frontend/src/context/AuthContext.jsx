@@ -4,6 +4,7 @@ import { Alert, AlertDetele } from "../utils/alert";
 
 const AuthContext = createContext();
 export const AuthProvider = ({ children }) => {
+ 
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
   useEffect(() => {
@@ -33,6 +34,19 @@ export const AuthProvider = ({ children }) => {
       <Navigate to="/home" />;
     
   };
+
+    const logOutAdmin = async () => {
+  
+      Alert("شما خارج شدید","success")
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setUser(null);
+      setToken(null);
+      
+      <Navigate to="/home" />;
+    
+  };
+  
   const isAuthenticated = !!token;
   const ProtectedRouteLogin = (children) => {
     return isAuthenticated ? <Navigate to="/home" replace /> : children;
@@ -40,7 +54,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ token, user, login, ProtectedRouteLogin, logOut }}
+      value={{ token, user, login, ProtectedRouteLogin, logOut,logOutAdmin }}
     >
       {children}
     </AuthContext.Provider>

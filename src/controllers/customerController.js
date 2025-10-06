@@ -93,6 +93,15 @@ exports.login = async (req, res) => {
             });
         }
 
+        // Check if JWT_SECRET is set
+        if (!process.env.JWT_SECRET) {
+            console.error('JWT_SECRET is not set');
+            return res.status(500).json({
+                success: false,
+                message: 'خطا در تنظیمات سرور'
+            });
+        }
+
         // Generate JWT token
         const token = jwt.sign(
             { 
@@ -100,7 +109,7 @@ exports.login = async (req, res) => {
                 email: customer.email,
                 role: 'customer'
             },
-            process.env.JWT_SECRET || 'your-secret-key',
+            process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
 

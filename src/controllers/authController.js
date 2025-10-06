@@ -54,33 +54,39 @@ exports.adminSignup = async (req, res) => {
 // Login for admin
 exports.adminLogin = async (req, res) => {
     try {
-        const { email, password, captchaId, captchaText } = req.body;
-
-        // اعتبارسنجی کپچا
-        const captchaResponse = await verifyCaptcha({ body: { captchaId, captchaText } });
-        if (!captchaResponse.success || !captchaResponse.isValid) {
-            return res.status(400).json({ message: 'کد کپچا اشتباه است' });
-        }
+        const { email, password } = req.body;
+        console.log('Login attempt for:', email);
 
         // Find admin by email
         const admin = await User.findOne({ email, role: 'admin' });
         if (!admin) {
+            console.log('Admin not found:', email);
             return res.status(401).json({ message: 'ایمیل یا رمز عبور اشتباه است' });
         }
 
         // Check password
-        const isMatch = await admin.comparePassword(password);
+        let isMatch;
+        try {
+            isMatch = await admin.comparePassword(password);
+            console.log('Password match result:', isMatch);
+        } catch (error) {
+            console.error('Error comparing password:', error);
+            return res.status(500).json({ message: 'خطا در بررسی رمز عبور' });
+        }
+
         if (!isMatch) {
+            console.log('Invalid password for:', email);
             return res.status(401).json({ message: 'ایمیل یا رمز عبور اشتباه است' });
         }
 
         // Generate JWT token
         const token = jwt.sign(
             { userId: admin._id, role: admin.role },
-            process.env.JWT_SECRET || 'your-secret-key',
+            process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
 
+        console.log('Login successful for:', email);
         res.json({
             message: 'ورود موفقیت‌آمیز',
             token,
@@ -92,6 +98,7 @@ exports.adminLogin = async (req, res) => {
             }
         });
     } catch (error) {
+        console.error('Admin login error:', error);
         res.status(500).json({ message: error.message });
     }
 }; 

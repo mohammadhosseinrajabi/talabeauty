@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import HomeNew from "../home_new/HomeNew";
+import AxiosExclusive from "../components/axiosConfig";
 
 export default function RightNav() {
   const [categories, setCategories] = useState([]);
@@ -9,9 +10,7 @@ export default function RightNav() {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/categories"
-        );
+        const response = await AxiosExclusive.get("/categories");
         if (response.status === 200) {
           setCategories(response.data.categories);
         }
@@ -31,9 +30,9 @@ export default function RightNav() {
         </Link>
       </li>
       <li className="nav-item">
-        <a className="nav-link" href="#productsSection">
+        <Link className="nav-link" to={"/productsPage"}>
           محصولات
-        </a>
+        </Link>
       </li>
       <li className="nav-item">
         <a className="nav-link" href="#papular-hairdresser">
@@ -54,9 +53,9 @@ export default function RightNav() {
         <ul className="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
           {categories.map((category) => (
             <li key={category._id}>
-              <a className="dropdown-item" href="#">
+              <Link className="dropdown-item" to={`/category/${category._id}`}>
                 {category.name}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>

@@ -8,6 +8,7 @@ import { Route, Routes } from "react-router-dom";
 import Dashboard from "./dashboard/dashboard";
 import Logout from "../../auth/logout";
 import Stylist from "./stylist/stylist";
+import Article from "./Article/article";
 
 export default function Content() {
   const { showSidebar } = useContext(AdminContext);
@@ -21,7 +22,8 @@ export default function Content() {
         <Route path="category" element={<Category />} />
         <Route path="product" element={<Product />} />
         <Route path="stylist" element={<Stylist />} />
-        <Route path="logout" element={<Logout/>}/>
+        <Route path="article" element={<Article />} />
+        {/* <Route path="logout" element={<Logout/>}/> */}
       </Routes>
     </section>
 
