@@ -12,7 +12,8 @@ export default function ShoppingCart() {
       navigate("/home");
     }
   }, []);
-  const { items, subtotal, removeItem, updateQty, clearCart } = useCart();
+  const { items, subtotal,totalQty, removeItem, updateQty, clearCart } = useCart();
+
   return (
     <>
       <NavDesktop />
@@ -28,13 +29,16 @@ export default function ShoppingCart() {
                 key={it.product._id}
               >
                 <div className="imagesProduct">
-                  <img src="" alt="محصول" className="imageThumbnailProduct" />
+                  <img
+                    src={`http://localhost:5000${it.product.images[0]}`}
+                    alt={it.product.name}
+                    className="imageThumbnailProduct"
+                  />
                 </div>
 
                 <div className="infoProduct ms-3 d-flex flex-column text-secondary flex-grow-1 min-w-0">
                   <p className="titeProduct me-3 ">{it.product.name}</p>
                   <p className="colorProduct me-3">{it.quantity} عدد</p>
-                 
                 </div>
 
                 <div className="d-flex align-items-center gap-2">
@@ -49,14 +53,18 @@ export default function ShoppingCart() {
                   >
                     +
                   </button> */}
-           
                 </div>
 
                 <p className="priceProduct text-danger mb-0 ms-auto text-break">
                   قیمت : {it.product.price}
                 </p>
 
-                <button className="btn btn-danger mt-2 mt-sm-0" onClick={() => removeItem(it.product._id)}>حذف</button>
+                <button
+                  className="btn btn-danger mt-2 mt-sm-0"
+                  onClick={() => removeItem(it.product._id)}
+                >
+                  حذف
+                </button>
               </div>
             ))}
           </div>
@@ -65,7 +73,7 @@ export default function ShoppingCart() {
             <span className="me-2">خلاصه سفارش</span>
             <div className="paymentSummary p-3 m-2 rounded bg-white">
               <p className="accountName bg-light text-center rounded p-2">
-                نام شما:
+                جمع بندی محصولات شما
               </p>
 
               <div className="row">
@@ -81,10 +89,10 @@ export default function ShoppingCart() {
                 <hr className="hrProduct" />
 
                 <div className="col-md-4 col-sm-8 mt-3">
-                  <p className="text-secondary">تعداد محصول:</p>
+                  <p className="text-secondary">تعداد محصول :</p>
                 </div>
                 <div className="col-md-8 col-sm-4 mt-3">
-                  <p className="text-secondary">0</p>
+                  <p className="text-secondary">{totalQty}</p>
                 </div>
 
                 <div className="col-md-4 col-sm-8 mt-3">
@@ -121,42 +129,3 @@ export default function ShoppingCart() {
   );
 }
 
-
-
-//delet it
-
-// import { useCart } from "../context/CartContext";
-
-// function Navbar() {
-//   const { totalQty } = useCart();
-//   return <span>سبد ({totalQty})</span>;
-// }
-
-// function ProductCard({ product }) {
-//   const { addItem } = useCart();
-//   return (
-//     <button onClick={() => addItem(product._id)}>افزودن به سبد</button>
-//   );
-// }
-
-// function ShoppingCartPage() {
-//   const { items, subtotal, removeItem, updateQty, clearCart } = useCart();
-//   return (
-//     <div>
-//       {items.map((it) => (
-//         <div key={it.product._id}>
-//           <p>{it.product.name}</p>
-//           <button onClick={() => updateQty(it.product._id, it.quantity + 1)}>
-//             +
-//           </button>
-//           <button onClick={() => updateQty(it.product._id, it.quantity - 1)}>
-//             -
-//           </button>
-//           <button onClick={() => removeItem(it.product._id)}>حذف</button>
-//         </div>
-//       ))}
-//       <p>جمع کل: {subtotal} تومان</p>
-//       <button onClick={clearCart}>خالی کردن</button>
-//     </div>
-//   );
-// }

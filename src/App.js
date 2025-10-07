@@ -10,19 +10,23 @@ import CustomerSignup from "./auth/customersignup";
 import LoginAdmin from "./auth/loginAdmin";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ForceRenderProv } from "./context/forceRenderContext";
-import ProductsPage from "./pages/productsPage/productsPage";
+
 
 import AuthContext from "./context/AuthContext";
 import StylistPage from "./pages/stylistPage/stylistPage";
 import ShopingCart from "./pages/shopping cart/shoppingCart";
 import { CartProvider } from "./context/cartContext";
-
+import AllProducts from "./pages/all products/allProducts";
+import ProductsPage from "./pages/single productsPage/productsPage";
+import CategoryPage from "./pages/categoryPage/categoryPage";
+import { FilterProvider } from "./context/FilterContext";
 
 function App() {
   const { ProtectedRouteLogin } = useContext(AuthContext);
   return (
     <ForceRenderProv>
-      <Router>
+      <FilterProvider>
+  <Router>
         <CartProvider>
           <div className="App">
             <Routes>
@@ -40,8 +44,6 @@ function App() {
               <Route path="/home" element={<HomeNew />} />
               <Route path="/ProductPage/:id" element={<ProductsPage />} />
               <Route path="/StylistPage/:id" element={<StylistPage />} />
-      
-
 
               <Route
                 path="/admin/*"
@@ -52,12 +54,17 @@ function App() {
                 }
               />
               <Route path="/shoppingCart" element={<ShopingCart />} />
+              <Route path="/productsPage" element={<AllProducts />} />
+               <Route path="/category/:categoryId" element={<CategoryPage />} />
+
 
               <Route path="*" element={<HomeNew />} />
             </Routes>
           </div>
         </CartProvider>
       </Router>
+      </FilterProvider>
+    
     </ForceRenderProv>
   );
 }

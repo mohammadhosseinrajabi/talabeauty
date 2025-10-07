@@ -1,0 +1,9 @@
+.formCheckFilter {
+  border: 1px solid black !important;
+}
+.searchBar {
+  height: 87px;
+  max-width: 376px;
+  width: 100%;
+  margin: 0 auto;
+}

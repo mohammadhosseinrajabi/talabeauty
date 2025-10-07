@@ -58,6 +58,8 @@ const ProductsPage = () => {
       <NavDesktop />
       <TopMenuMobile />
 
+
+
       <div className="product-detail-page">
         <div className="product-container">
           {/* Product Images Section */}
